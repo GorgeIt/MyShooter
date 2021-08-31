@@ -48,6 +48,9 @@ namespace UnityStandardAssets.Characters.FirstPerson
         public GameObject sphera;
         private bool isColor;
 
+        public GameObject character;
+        Animator anim;
+
 
         // Use this for initialization
         private void Start()
@@ -62,10 +65,12 @@ namespace UnityStandardAssets.Characters.FirstPerson
             m_Jumping = false;
             m_AudioSource = GetComponent<AudioSource>();
 			m_MouseLook.Init(transform , m_Camera.transform);
+            anim = character.GetComponent<Animator>();
 
             if (!photonView.IsMine)
             {
-                GetComponentInChildren<Camera>().gameObject.SetActive(false);
+                GetComponentInChildren<Camera>().enabled = false;
+                GetComponentInChildren<AudioListener>().enabled = false;
                 GetComponent<FirstPersonController>().enabled = false;
             }
         }
@@ -161,8 +166,12 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
             ProgressStepCycle(speed);
             UpdateCameraPosition(speed);
-
+            if (m_MoveDir.x == 0 && m_MoveDir.z == 0)
+                anim.SetBool("isMove", false);
+            else
+                anim.SetBool("isMove", true);
             m_MouseLook.UpdateCursorLock();
+
         }
 
 
@@ -187,7 +196,6 @@ namespace UnityStandardAssets.Characters.FirstPerson
             }
 
             m_NextStep = m_StepCycle + m_StepInterval;
-
             PlayFootStepAudio();
         }
 
